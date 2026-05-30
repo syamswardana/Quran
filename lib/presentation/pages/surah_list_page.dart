@@ -5,6 +5,7 @@ import 'package:quran/core/app_theme.dart';
 import 'package:quran/presentation/bloc/surah_bloc/surah_bloc.dart';
 import 'package:quran/presentation/bloc/surah_bloc/surah_event.dart';
 import 'package:quran/presentation/bloc/surah_bloc/surah_state.dart';
+import 'package:quran/presentation/pages/surah_detail_page.dart';
 import 'package:quran/presentation/widgets/category_tabs.dart';
 import 'package:quran/presentation/widgets/surah_list_tile.dart';
 import 'package:quran/presentation/widgets/surah_search_bar.dart';
@@ -40,13 +41,14 @@ class SurahListPage extends StatelessWidget {
                     (prev is! SurahLoaded ||
                         prev.selectedTab != curr.selectedTab),
                 builder: (context, state) {
-                  final selectedTab =
-                      state is SurahLoaded ? state.selectedTab : 0;
+                  final selectedTab = state is SurahLoaded
+                      ? state.selectedTab
+                      : 0;
                   return CategoryTabs(
                     selectedIndex: selectedTab,
-                    onChanged: (index) => context
-                        .read<SurahBloc>()
-                        .add(FilterSurahByCategoryEvent(index)),
+                    onChanged: (index) => context.read<SurahBloc>().add(
+                      FilterSurahByCategoryEvent(index),
+                    ),
                   );
                 },
               ),
@@ -67,8 +69,11 @@ class SurahListPage extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.cloud_off,
-                                color: AppColors.secondaryText, size: 48.sp),
+                            Icon(
+                              Icons.cloud_off,
+                              color: AppColors.secondaryText,
+                              size: 48.sp,
+                            ),
                             SizedBox(height: 16.h),
                             Text(
                               state.message,
@@ -77,13 +82,14 @@ class SurahListPage extends StatelessWidget {
                             ),
                             SizedBox(height: 16.h),
                             TextButton(
-                              onPressed: () => context
-                                  .read<SurahBloc>()
-                                  .add(GetAllSurahEvent()),
+                              onPressed: () => context.read<SurahBloc>().add(
+                                GetAllSurahEvent(),
+                              ),
                               child: Text(
                                 'Retry',
-                                style: AppTextStyles.surahName
-                                    .copyWith(color: AppColors.gold),
+                                style: AppTextStyles.surahName.copyWith(
+                                  color: AppColors.gold,
+                                ),
                               ),
                             ),
                           ],
@@ -96,8 +102,10 @@ class SurahListPage extends StatelessWidget {
 
                       if (surahs.isEmpty) {
                         return Center(
-                          child: Text('No surahs found',
-                              style: AppTextStyles.surahMeta),
+                          child: Text(
+                            'No surahs found',
+                            style: AppTextStyles.surahMeta,
+                          ),
                         );
                       }
 
@@ -105,7 +113,18 @@ class SurahListPage extends StatelessWidget {
                         padding: EdgeInsets.zero,
                         itemCount: surahs.length,
                         itemBuilder: (context, index) {
-                          return SurahListTile(surah: surahs[index]);
+                          return SurahListTile(
+                            surah: surahs[index],
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      SurahDetailPage(surah: surahs[index]),
+                                ),
+                              );
+                            },
+                          );
                         },
                       );
                     }

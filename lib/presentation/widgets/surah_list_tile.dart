@@ -5,13 +5,9 @@ import 'package:quran/domain/entities/surah.dart';
 
 class SurahListTile extends StatelessWidget {
   final Surah surah;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
 
-  const SurahListTile({
-    super.key,
-    required this.surah,
-    this.onTap,
-  });
+  const SurahListTile({super.key, required this.surah, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +27,7 @@ class SurahListTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12.r),
               ),
               alignment: Alignment.center,
-              child: Text(
-                '${surah.number}',
-                style: AppTextStyles.surahNumber,
-              ),
+              child: Text('${surah.number}', style: AppTextStyles.surahNumber),
             ),
             SizedBox(width: 14.w),
             // Name + metadata
