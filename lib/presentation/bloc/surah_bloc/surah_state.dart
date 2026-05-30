@@ -13,12 +13,20 @@ class SurahInitial extends SurahState {}
 class SurahLoading extends SurahState {}
 
 class SurahLoaded extends SurahState {
-  final List<Surah> surahs;
+  final List<Surah> allSurahs;
+  final List<Surah> filteredSurahs;
+  final String searchQuery;
+  final int selectedTab;
 
-  const SurahLoaded(this.surahs);
+  const SurahLoaded({
+    required this.allSurahs,
+    required this.filteredSurahs,
+    this.searchQuery = '',
+    this.selectedTab = 0,
+  });
 
   @override
-  List<Object?> get props => [surahs];
+  List<Object?> get props => [allSurahs, filteredSurahs, searchQuery, selectedTab];
 }
 
 class SurahError extends SurahState {

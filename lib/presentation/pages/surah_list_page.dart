@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quran/core/app_theme.dart';
-import 'package:quran/domain/entities/surah.dart';
 import 'package:quran/presentation/bloc/surah_bloc/surah_bloc.dart';
 import 'package:quran/presentation/bloc/surah_bloc/surah_event.dart';
 import 'package:quran/presentation/bloc/surah_bloc/surah_state.dart';
@@ -10,43 +9,8 @@ import 'package:quran/presentation/widgets/category_tabs.dart';
 import 'package:quran/presentation/widgets/surah_list_tile.dart';
 import 'package:quran/presentation/widgets/surah_search_bar.dart';
 
-class SurahListPage extends StatefulWidget {
+class SurahListPage extends StatelessWidget {
   const SurahListPage({super.key});
-
-  @override
-  State<SurahListPage> createState() => _SurahListPageState();
-}
-
-class _SurahListPageState extends State<SurahListPage> {
-  int _selectedTab = 0;
-  String _searchQuery = '';
-
-  List<Surah> _filterSurahs(List<Surah> surahs) {
-    var filtered = surahs;
-
-    // Filter by category
-    if (_selectedTab == 1) {
-      filtered = filtered
-          .where((s) => s.revelationType == RevelationType.meccan)
-          .toList();
-    } else if (_selectedTab == 2) {
-      filtered = filtered
-          .where((s) => s.revelationType == RevelationType.medinan)
-          .toList();
-    }
-
-    // Filter by search
-    if (_searchQuery.isNotEmpty) {
-      final query = _searchQuery.toLowerCase();
-      filtered = filtered
-          .where((s) =>
-              s.englishName.toLowerCase().contains(query) ||
-              s.name.contains(_searchQuery))
-          .toList();
-    }
-
-    return filtered;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,14 +28,27 @@ class _SurahListPageState extends State<SurahListPage> {
 
               // Search bar
               SurahSearchBar(
-                onChanged: (value) => setState(() => _searchQuery = value),
+                onChanged: (query) =>
+                    context.read<SurahBloc>().add(SearchSurahEvent(query)),
               ),
               SizedBox(height: 16.h),
 
               // Category tabs
-              CategoryTabs(
-                selectedIndex: _selectedTab,
-                onChanged: (index) => setState(() => _selectedTab = index),
+              BlocBuilder<SurahBloc, SurahState>(
+                buildWhen: (prev, curr) =>
+                    curr is SurahLoaded &&
+                    (prev is! SurahLoaded ||
+                        prev.selectedTab != curr.selectedTab),
+                builder: (context, state) {
+                  final selectedTab =
+                      state is SurahLoaded ? state.selectedTab : 0;
+                  return CategoryTabs(
+                    selectedIndex: selectedTab,
+                    onChanged: (index) => context
+                        .read<SurahBloc>()
+                        .add(FilterSurahByCategoryEvent(index)),
+                  );
+                },
               ),
               SizedBox(height: 8.h),
 
@@ -115,7 +92,7 @@ class _SurahListPageState extends State<SurahListPage> {
                     }
 
                     if (state is SurahLoaded) {
-                      final surahs = _filterSurahs(state.surahs);
+                      final surahs = state.filteredSurahs;
 
                       if (surahs.isEmpty) {
                         return Center(
