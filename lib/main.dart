@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quran/core/app_theme.dart';
+import 'package:quran/core/injection/service_locator.dart';
+import 'package:quran/presentation/bloc/surah_bloc/surah_bloc.dart';
+import 'package:quran/presentation/bloc/surah_bloc/surah_event.dart';
 import 'package:quran/presentation/pages/surah_list_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  setupLocator();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -26,11 +31,18 @@ class QuranApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
-          title: 'Quran',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.dark,
-          home: const SurahListPage(),
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider<SurahBloc>(
+              create: (_) => sl<SurahBloc>()..add(GetAllSurahEvent()),
+            ),
+          ],
+          child: MaterialApp(
+            title: 'Quran',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.dark,
+            home: const SurahListPage(),
+          ),
         );
       },
     );

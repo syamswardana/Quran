@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quran/core/app_theme.dart';
-import 'package:quran/domain/surah.dart';
+import 'package:quran/domain/entities/surah.dart';
 
 class SurahListTile extends StatelessWidget {
   final Surah surah;
@@ -42,10 +42,10 @@ class SurahListTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(surah.nameEn, style: AppTextStyles.surahName),
+                  Text(surah.englishName, style: AppTextStyles.surahName),
                   SizedBox(height: 3.h),
                   Text(
-                    '${surah.categoryLabel} • ${surah.ayahCount} Ayahs',
+                    '${surah.categoryLabel} • ${surah.numberOfAyahs} Ayahs',
                     style: AppTextStyles.surahMeta,
                   ),
                 ],
@@ -54,7 +54,7 @@ class SurahListTile extends StatelessWidget {
             SizedBox(width: 14.w),
             // Arabic name
             Text(
-              surah.nameAr,
+              surah.name,
               style: AppTextStyles.arabicName,
               textAlign: TextAlign.right,
             ),
