@@ -4,7 +4,9 @@ import 'package:quran/data/datasources/surah_remote_datasource.dart';
 import 'package:quran/data/repositories/surah_repository_impl.dart';
 import 'package:quran/domain/repositories/surah_repository.dart';
 import 'package:quran/domain/usecases/get_all_surah.dart';
+import 'package:quran/domain/usecases/get_surah_detail.dart';
 import 'package:quran/presentation/bloc/surah_bloc/surah_bloc.dart';
+import 'package:quran/presentation/bloc/ayah_bloc/ayah_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -24,8 +26,10 @@ void setupLocator() {
 
   // Use cases
   sl.registerLazySingleton(() => GetAllSurah(sl()));
+  sl.registerLazySingleton(() => GetSurahDetail(sl()));
 
   // Blocs
   sl.registerFactory(() => SurahBloc(getAllSurah: sl()));
+  sl.registerFactory(() => AyahBloc(getSurahDetail: sl()));
 }
 

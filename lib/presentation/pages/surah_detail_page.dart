@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quran/core/app_theme.dart';
 import 'package:quran/domain/entities/surah.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quran/core/injection/service_locator.dart';
+import 'package:quran/presentation/bloc/ayah_bloc/ayah_bloc.dart';
+import 'package:quran/presentation/bloc/ayah_bloc/ayah_event.dart';
+import 'package:quran/presentation/bloc/ayah_bloc/ayah_state.dart';
 
 class SurahDetailPage extends StatelessWidget {
   final Surah surah;
@@ -10,31 +15,13 @@ class SurahDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Mock data based on the design
-    final List<Map<String, String>> ayahs = [
-      {
-        'arabic': 'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ',
-        'translation': 'All praise is due to Allah, Lord of the worlds.',
-      },
-      {
-        'arabic': 'الرَّحْمَٰنِ الرَّحِيمِ',
-        'translation': 'The Most Gracious, the Most Merciful.',
-      },
-      {
-        'arabic': 'مَالِكِ يَوْمِ الدِّينِ',
-        'translation': 'Master of the Day of Judgment.',
-      },
-      {
-        'arabic': 'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ',
-        'translation': 'You alone we worship, and You alone we ask for help.',
-      },
-    ];
-
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
+    return BlocProvider(
+      create: (context) => sl<AyahBloc>()..add(GetSurahDetailEvent(surah.number)),
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: Column(
+            children: [
             // Header
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
@@ -100,6 +87,16 @@ class SurahDetailPage extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 16.h),
+                          // Pills
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _buildInfoPill('${surah.numberOfAyahs} Ayahs'),
+                              SizedBox(width: 16.w),
+                              _buildInfoPill(surah.categoryLabel),
+                            ],
+                          ),
+                          SizedBox(height: 16.h),
                           // Bismillah
                           Container(
                             height: 1.h,
@@ -121,13 +118,32 @@ class SurahDetailPage extends StatelessWidget {
                     SizedBox(height: 20.h),
                     
                     // Ayahs List
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: ayahs.length,
-                      separatorBuilder: (context, index) => SizedBox(height: 12.h),
-                      itemBuilder: (context, index) {
-                        final ayah = ayahs[index];
+                    BlocBuilder<AyahBloc, AyahState>(
+                      builder: (context, state) {
+                        if (state is AyahLoading) {
+                          return Padding(
+                            padding: EdgeInsets.only(top: 40.h),
+                            child: const Center(child: CircularProgressIndicator()),
+                          );
+                        } else if (state is AyahError) {
+                          return Padding(
+                            padding: EdgeInsets.only(top: 40.h),
+                            child: Center(
+                              child: Text(
+                                state.message,
+                                style: TextStyle(color: Colors.red, fontSize: 14.sp),
+                              ),
+                            ),
+                          );
+                        } else if (state is AyahLoaded) {
+                          final ayahs = state.surahDetail.ayahs;
+                          return ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: ayahs.length,
+                            separatorBuilder: (context, index) => SizedBox(height: 12.h),
+                            itemBuilder: (context, index) {
+                              final ayah = ayahs[index];
                         return Container(
                           padding: EdgeInsets.all(16.w),
                           decoration: BoxDecoration(
@@ -166,7 +182,7 @@ class SurahDetailPage extends StatelessWidget {
                               
                               // Arabic Text
                               Text(
-                                ayah['arabic']!,
+                                ayah.text,
                                 style: AppTextStyles.arabicName.copyWith(
                                   color: AppColors.primaryText,
                                   fontSize: 26.sp,
@@ -185,7 +201,7 @@ class SurahDetailPage extends StatelessWidget {
                               
                               // Translation Text
                               Text(
-                                ayah['translation']!,
+                                ayah.transliteration,
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   fontSize: 14.sp,
@@ -194,16 +210,39 @@ class SurahDetailPage extends StatelessWidget {
                                   height: 1.5,
                                 ),
                               ),
-                            ],
-                          ),
+                                ],
+                              ),
+                            );
+                          },
                         );
-                      },
-                    ),
-                  ],
-                ),
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
+        ],
+      ),
+    ),
+  ));
+}
+
+  Widget _buildInfoPill(String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: AppColors.gold.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 11.sp,
+          fontWeight: FontWeight.w500,
+          color: AppColors.gold,
         ),
       ),
     );
