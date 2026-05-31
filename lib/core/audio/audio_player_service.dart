@@ -2,7 +2,10 @@ import 'package:just_audio/just_audio.dart';
 import 'package:quran/domain/entities/ayah.dart';
 
 class AudioPlayerService {
-  final AudioPlayer _audioPlayer = AudioPlayer();
+  final AudioPlayer _audioPlayer;
+
+  AudioPlayerService({AudioPlayer? audioPlayer})
+      : _audioPlayer = audioPlayer ?? AudioPlayer();
 
   AudioPlayer get player => _audioPlayer;
 
