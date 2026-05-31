@@ -1,17 +1,50 @@
-# quran
+# Simple Quran
 
-Simple Quran
+A simple and beautiful Flutter Quran application implementing Clean Architecture.
 
-## Getting Started
+## 🏗️ Project Structure
 
-This project is a starting point for a Flutter application.
+This project follows Clean Architecture principles to separate concerns and maintain a scalable codebase. The main code is located in the `lib` directory:
 
-A few resources to get you started if this is your first Flutter project:
+```text
+lib/
+├── core/           # Core utilities, extensions, network, and audio services
+├── data/           # Data layer containing repositories implementations, models, and data sources (API)
+├── domain/         # Domain layer containing entities, abstract repositories, and use cases
+└── presentation/   # Presentation layer containing UI (pages/widgets) and state management (BLoC)
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## 📦 Requirements
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **Flutter SDK**: ^3.12.0
+- **flutter_bloc**: ^9.1.0 (Minimum required version)
+
+## 🚀 How to Run
+
+Follow these steps to run the application on your local machine:
+
+1. **Get Dependencies**:
+   Run the following command to install all required packages:
+   ```bash
+   flutter pub get
+   ```
+
+2. **Generate Files**:
+   Since this project uses `get_it` and `mockito` (for tests), it might require code generation. Run:
+   ```bash
+   flutter pub run build_runner build --delete-conflicting-outputs
+   ```
+
+3. **Run the App**:
+   Ensure you have a device connected or an emulator running, then execute:
+   ```bash
+   flutter run
+   ```
+
+## 🧪 Running Tests
+
+To run the unit and widget tests:
+
+```bash
+flutter test
+```
