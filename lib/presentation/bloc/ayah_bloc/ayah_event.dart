@@ -34,6 +34,8 @@ class PlayAyahEvent extends AyahEvent {
 
 class PauseAudioEvent extends AyahEvent {}
 
+class ResumeAudioEvent extends AyahEvent {}
+
 class UpdateAudioStateEvent extends AyahEvent {
   final bool isPlaying;
   final int? currentIndex;
@@ -49,4 +51,11 @@ class UpdateAudioStateEvent extends AyahEvent {
   
   @override
   List<Object?> get props => [isPlaying, currentIndex, position, duration];
+}
+
+class SeekAudioEvent extends AyahEvent {
+  final Duration position;
+  const SeekAudioEvent(this.position);
+  @override
+  List<Object?> get props => [position];
 }

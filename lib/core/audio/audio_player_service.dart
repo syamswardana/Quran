@@ -19,6 +19,14 @@ class AudioPlayerService {
     await _audioPlayer.setAudioSource(playlist);
   }
 
+  Future<void> initSingleAyah(Ayah ayah) async {
+    final source = AudioSource.uri(
+      Uri.parse(ayah.audioUrl),
+      tag: ayah.numberInSurah,
+    );
+    await _audioPlayer.setAudioSource(source);
+  }
+
   Future<void> play() async => await _audioPlayer.play();
   Future<void> pause() async => await _audioPlayer.pause();
   Future<void> stop() async => await _audioPlayer.stop();

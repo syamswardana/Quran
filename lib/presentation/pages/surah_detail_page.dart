@@ -282,6 +282,13 @@ class SurahDetailPage extends StatelessWidget {
     );
   }
 
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$minutes:$seconds";
+  }
+
   Widget _buildMiniPlayer(BuildContext context, AyahLoaded state) {
     final ayahs = state.surahDetail.ayahs;
     final currentIndex = state.currentPlayingAyahIndex ?? 0;
@@ -336,7 +343,7 @@ class SurahDetailPage extends StatelessWidget {
                   if (state.isPlaying) {
                     context.read<AyahBloc>().add(PauseAudioEvent());
                   } else {
-                    context.read<AyahBloc>().add(PlayAyahEvent(currentIndex, ayahs));
+                    context.read<AyahBloc>().add(ResumeAudioEvent());
                   }
                 },
                 padding: EdgeInsets.zero,
@@ -345,16 +352,36 @@ class SurahDetailPage extends StatelessWidget {
             ],
           ),
           SizedBox(height: 8.h),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(2.r),
-            child: LinearProgressIndicator(
-              value: state.duration.inMilliseconds > 0 
-                  ? state.position.inMilliseconds / state.duration.inMilliseconds 
-                  : 0.0,
-              backgroundColor: AppColors.background,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.gold),
-              minHeight: 4.h,
-            ),
+          Row(
+            children: [
+              Text(
+                _formatDuration(state.position),
+                style: TextStyle(color: AppColors.secondaryText, fontSize: 12.sp, fontFamily: 'Inter'),
+              ),
+              Expanded(
+                child: SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackHeight: 4.h,
+                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.r),
+                    overlayShape: RoundSliderOverlayShape(overlayRadius: 14.r),
+                    activeTrackColor: AppColors.gold,
+                    inactiveTrackColor: AppColors.background,
+                    thumbColor: AppColors.gold,
+                  ),
+                  child: Slider(
+                    value: state.position.inMilliseconds.toDouble().clamp(0.0, state.duration.inMilliseconds.toDouble() > 0 ? state.duration.inMilliseconds.toDouble() : 1.0),
+                    max: state.duration.inMilliseconds > 0 ? state.duration.inMilliseconds.toDouble() : 1.0,
+                    onChanged: (value) {
+                      context.read<AyahBloc>().add(SeekAudioEvent(Duration(milliseconds: value.toInt())));
+                    },
+                  ),
+                ),
+              ),
+              Text(
+                _formatDuration(state.duration),
+                style: TextStyle(color: AppColors.secondaryText, fontSize: 12.sp, fontFamily: 'Inter'),
+              ),
+            ],
           ),
         ],
       ),
