@@ -9,6 +9,8 @@ import 'package:quran/presentation/pages/surah_detail_page.dart';
 import 'package:quran/presentation/widgets/category_tabs.dart';
 import 'package:quran/presentation/widgets/surah_list_tile.dart';
 import 'package:quran/presentation/widgets/surah_search_bar.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import 'package:quran/domain/entities/surah.dart';
 
 class SurahListPage extends StatelessWidget {
   const SurahListPage({super.key});
@@ -59,8 +61,30 @@ class SurahListPage extends StatelessWidget {
                 child: BlocBuilder<SurahBloc, SurahState>(
                   builder: (context, state) {
                     if (state is SurahLoading || state is SurahInitial) {
-                      return const Center(
-                        child: CircularProgressIndicator(color: AppColors.gold),
+                      final dummySurahs = List.generate(
+                        7,
+                        (index) => Surah(
+                          number: index + 1,
+                          name: 'سورة البقرة',
+                          englishName: 'Al-Baqarah',
+                          englishNameTranslation: 'The Cow',
+                          numberOfAyahs: 286,
+                          revelationType: RevelationType.medinan,
+                        ),
+                      );
+
+                      return Skeletonizer(
+                        enabled: true,
+                        child: ListView.builder(
+                          padding: EdgeInsets.zero,
+                          itemCount: dummySurahs.length,
+                          itemBuilder: (context, index) {
+                            return SurahListTile(
+                              surah: dummySurahs[index],
+                              onTap: () {},
+                            );
+                          },
+                        ),
                       );
                     }
 

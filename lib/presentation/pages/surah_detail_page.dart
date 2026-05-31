@@ -7,6 +7,8 @@ import 'package:quran/core/injection/service_locator.dart';
 import 'package:quran/presentation/bloc/ayah_bloc/ayah_bloc.dart';
 import 'package:quran/presentation/bloc/ayah_bloc/ayah_event.dart';
 import 'package:quran/presentation/bloc/ayah_bloc/ayah_state.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import 'package:quran/domain/entities/ayah.dart';
 
 class SurahDetailPage extends StatelessWidget {
   final Surah surah;
@@ -138,9 +140,106 @@ class SurahDetailPage extends StatelessWidget {
                     BlocBuilder<AyahBloc, AyahState>(
                       builder: (context, state) {
                         if (state is AyahLoading) {
-                          return Padding(
-                            padding: EdgeInsets.only(top: 40.h),
-                            child: const Center(child: CircularProgressIndicator()),
+                          final dummyAyahs = List.generate(
+                            5,
+                            (index) => Ayah(
+                              number: index + 1,
+                              numberInSurah: index + 1,
+                              text: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+                              transliteration: 'Bismillaahir Rahmaanir Raheem',
+                              translation: 'In the name of Allah, the Entirely Merciful, the Especially Merciful.',
+                              audioUrl: '',
+                            ),
+                          );
+
+                          return Skeletonizer(
+                            enabled: true,
+                            child: ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: dummyAyahs.length,
+                              separatorBuilder: (context, index) => SizedBox(height: 12.h),
+                              itemBuilder: (context, index) {
+                                final ayah = dummyAyahs[index];
+                                return Container(
+                                  padding: EdgeInsets.all(16.w),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surface,
+                                    borderRadius: BorderRadius.circular(14.r),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      // Top bar with ayah number
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            width: 28.w,
+                                            height: 28.w,
+                                            decoration: BoxDecoration(
+                                              color: AppColors.activeTab,
+                                              borderRadius: BorderRadius.circular(14.r),
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              '${index + 1}',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: Icon(
+                                              Icons.play_arrow_outlined,
+                                              color: AppColors.gold,
+                                              size: 24.sp,
+                                            ),
+                                            onPressed: () {},
+                                            padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 12.h),
+                                      
+                                      // Arabic Text
+                                      Text(
+                                        ayah.text,
+                                        style: AppTextStyles.arabicName.copyWith(
+                                          color: AppColors.primaryText,
+                                          fontSize: 26.sp,
+                                          height: 2,
+                                        ),
+                                        textAlign: TextAlign.right,
+                                      ),
+                                      SizedBox(height: 12.h),
+                                      
+                                      // Divider
+                                      Container(
+                                        height: 1.h,
+                                        color: const Color(0xFF2A3A4D).withValues(alpha: 0.3),
+                                      ),
+                                      SizedBox(height: 12.h),
+                                      
+                                      // Translation Text
+                                      Text(
+                                        ayah.transliteration,
+                                        style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.normal,
+                                          color: AppColors.secondaryText,
+                                          height: 1.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                           );
                         } else if (state is AyahError) {
                           return Padding(
@@ -290,7 +389,7 @@ class SurahDetailPage extends StatelessWidget {
   }
 
   Widget _buildMiniPlayer(BuildContext context, AyahLoaded state) {
-    final ayahs = state.surahDetail.ayahs;
+
     final currentIndex = state.currentPlayingAyahIndex ?? 0;
     
     return Container(
