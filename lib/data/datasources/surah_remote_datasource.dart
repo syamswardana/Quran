@@ -23,7 +23,7 @@ class SurahRemoteDataSourceImpl implements SurahRemoteDataSource {
   @override
   Future<SurahDetailModel> getSurahDetail(int surahNumber) async {
     final response = await dio.get(
-      '/surah/$surahNumber/editions/quran-uthmani-quran-academy,en.transliteration,en.walk',
+      '/surah/$surahNumber/editions/"quran-uthmani-quran-academy,en.transliteration,en.walk,ar.alafasy',
     );
     final data = response.data['data'] as List;
     return SurahDetailModel.fromDataList(data);

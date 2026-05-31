@@ -8,11 +8,14 @@ import 'package:quran/domain/usecases/get_surah_detail.dart';
 import 'package:quran/presentation/bloc/surah_bloc/surah_bloc.dart';
 import 'package:quran/presentation/bloc/ayah_bloc/ayah_bloc.dart';
 
+import 'package:quran/core/audio/audio_player_service.dart';
+
 final sl = GetIt.instance;
 
 void setupLocator() {
   // Core
   sl.registerLazySingleton(() => DioClient.instance.dio);
+  sl.registerLazySingleton(() => AudioPlayerService());
 
   // Data sources
   sl.registerLazySingleton<SurahRemoteDataSource>(
@@ -30,6 +33,9 @@ void setupLocator() {
 
   // Blocs
   sl.registerFactory(() => SurahBloc(getAllSurah: sl()));
-  sl.registerFactory(() => AyahBloc(getSurahDetail: sl()));
+  sl.registerFactory(() => AyahBloc(
+        getSurahDetail: sl(),
+        audioPlayerService: sl(),
+      ));
 }
 

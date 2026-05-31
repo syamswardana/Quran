@@ -6,6 +6,7 @@ class Ayah extends Equatable {
   final String text;
   final String transliteration;
   final String translation;
+  final String audioUrl;
 
   const Ayah({
     required this.number,
@@ -13,6 +14,7 @@ class Ayah extends Equatable {
     required this.text,
     required this.transliteration,
     required this.translation,
+    required this.audioUrl,
   });
 
   @override
@@ -22,5 +24,6 @@ class Ayah extends Equatable {
         text,
         transliteration,
         translation,
+        audioUrl,
       ];
 }

@@ -15,19 +15,19 @@ class SurahDetailModel extends SurahDetail {
 
   factory SurahDetailModel.fromDataList(List<dynamic> dataList) {
     final tajweedSurah = dataList[0] as Map<String, dynamic>;
-    final transliterationSurah = dataList[1] as Map<String, dynamic>;
-    final translationSurah = dataList[2] as Map<String, dynamic>;
 
-    final tajweedAyahs = tajweedSurah['ayahs'] as List;
-    final transliterationAyahs = transliterationSurah['ayahs'] as List;
-    final translationAyahs = translationSurah['ayahs'] as List;
+    final tajweedAyahs = dataList[0]['ayahs'] as List;
+    final transliterationAyahs = dataList[1]['ayahs'] as List;
+    final translationAyahs = dataList[2]['ayahs'] as List;
+    final audioAyahs = dataList[3]['ayahs'] as List;
 
-    List<AyahModel> ayahs = [];
+    final ayahs = <AyahModel>[];
     for (int i = 0; i < tajweedAyahs.length; i++) {
       ayahs.add(AyahModel.fromJsons(
         tajweedJson: tajweedAyahs[i] as Map<String, dynamic>,
         transliterationJson: transliterationAyahs[i] as Map<String, dynamic>,
         translationJson: translationAyahs[i] as Map<String, dynamic>,
+        audioJson: audioAyahs[i] as Map<String, dynamic>,
       ));
     }
 

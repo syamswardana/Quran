@@ -19,6 +19,15 @@ class SurahDetailPage extends StatelessWidget {
       create: (context) => sl<AyahBloc>()..add(GetSurahDetailEvent(surah.number)),
       child: Scaffold(
         backgroundColor: AppColors.background,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: BlocBuilder<AyahBloc, AyahState>(
+          builder: (context, state) {
+            if (state is AyahLoaded && (state.isPlaying || state.currentPlayingAyahIndex != null)) {
+              return _buildMiniPlayer(context, state);
+            }
+            return const SizedBox.shrink();
+          },
+        ),
         body: SafeArea(
           child: Column(
             children: [
@@ -47,11 +56,19 @@ class SurahDetailPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  IconButton(
-                    icon: Icon(Icons.play_arrow, color: AppColors.secondaryText, size: 24.sp),
-                    onPressed: () {},
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
+                  BlocBuilder<AyahBloc, AyahState>(
+                    builder: (context, state) {
+                      return IconButton(
+                        icon: Icon(Icons.play_arrow, color: AppColors.secondaryText, size: 24.sp),
+                        onPressed: () {
+                          if (state is AyahLoaded) {
+                            context.read<AyahBloc>().add(PlaySurahEvent(state.surahDetail.ayahs));
+                          }
+                        },
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -175,7 +192,24 @@ class SurahDetailPage extends StatelessWidget {
                                     ),
                                   ),
 
-                                  Icon(Icons.play_arrow_outlined, color: AppColors.gold, size: 20.sp),
+                                  IconButton(
+                                    icon: Icon(
+                                      (state.currentPlayingAyahIndex == index && state.isPlaying)
+                                          ? Icons.pause_circle_outline
+                                          : Icons.play_arrow_outlined,
+                                      color: AppColors.gold,
+                                      size: 24.sp,
+                                    ),
+                                    onPressed: () {
+                                      if (state.currentPlayingAyahIndex == index && state.isPlaying) {
+                                        context.read<AyahBloc>().add(PauseAudioEvent());
+                                      } else {
+                                        context.read<AyahBloc>().add(PlayAyahEvent(index, state.surahDetail.ayahs));
+                                      }
+                                    },
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  ),
                                 ],
                               ),
                               SizedBox(height: 12.h),
@@ -244,6 +278,85 @@ class SurahDetailPage extends StatelessWidget {
           fontWeight: FontWeight.w500,
           color: AppColors.gold,
         ),
+      ),
+    );
+  }
+
+  Widget _buildMiniPlayer(BuildContext context, AyahLoaded state) {
+    final ayahs = state.surahDetail.ayahs;
+    final currentIndex = state.currentPlayingAyahIndex ?? 0;
+    
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20.w),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Playing Ayah ${currentIndex + 1}',
+                    style: TextStyle(
+                      color: AppColors.primaryText,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                  Text(
+                    state.surahDetail.englishName,
+                    style: TextStyle(
+                      color: AppColors.secondaryText,
+                      fontSize: 12.sp,
+                    ),
+                  ),
+                ],
+              ),
+              IconButton(
+                icon: Icon(
+                  state.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
+                  color: AppColors.gold,
+                  size: 36.sp,
+                ),
+                onPressed: () {
+                  if (state.isPlaying) {
+                    context.read<AyahBloc>().add(PauseAudioEvent());
+                  } else {
+                    context.read<AyahBloc>().add(PlayAyahEvent(currentIndex, ayahs));
+                  }
+                },
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(2.r),
+            child: LinearProgressIndicator(
+              value: state.duration.inMilliseconds > 0 
+                  ? state.position.inMilliseconds / state.duration.inMilliseconds 
+                  : 0.0,
+              backgroundColor: AppColors.background,
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.gold),
+              minHeight: 4.h,
+            ),
+          ),
+        ],
       ),
     );
   }

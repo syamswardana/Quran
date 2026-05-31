@@ -7,12 +7,14 @@ class AyahModel extends Ayah {
     required super.text,
     required super.transliteration,
     required super.translation,
+    required super.audioUrl,
   });
 
   factory AyahModel.fromJsons({
     required Map<String, dynamic> tajweedJson,
     required Map<String, dynamic> transliterationJson,
     required Map<String, dynamic> translationJson,
+    required Map<String, dynamic> audioJson,
   }) {
     return AyahModel(
       number: tajweedJson['number'] as int,
@@ -20,6 +22,7 @@ class AyahModel extends Ayah {
       text: tajweedJson['text'] as String,
       transliteration: transliterationJson['text'] as String,
       translation: translationJson['text'] as String,
+      audioUrl: audioJson['audio'] as String,
     );
   }
 }
